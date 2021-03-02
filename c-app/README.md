@@ -10,3 +10,9 @@ Don't forget to setup SGX SDK environments
 source $SGXSDK_DIR/environment
 ```
 
+Build with
+```
+SGX=1 make
+```
+
+
