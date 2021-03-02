@@ -21,12 +21,12 @@ TARGET = app
 
 RM = rm -f
 
-ifneq ($(SGX_MODE), HW)
-	URTS_LIB_NAME := sgx_urts_sim
-	UAE_SERVICE_LIB := sgx_uae_service_sim
-else
+ifeq ($(SGX),1)
 	URTS_LIB_NAME := sgx_urts
 	UAE_SERVICE_LIB := sgx_uae_service
+else
+	URTS_LIB_NAME := sgx_urts_sim
+	UAE_SERVICE_LIB := sgx_uae_service_sim
 endif
 
 INC:=-I$(SGX_SDK)/include -I../Include
@@ -34,7 +34,7 @@ LIB := -l$(URTS_LIB_NAME) -l$(UAE_SERVICE_LIB) -L$(SGX_SDK)/lib64 -lpthread
 CXXFLAGS += $(INC) $(LIB)
 CFLAGS += $(INC) $(LIB)
 
-ifeq ($(SGX_DEBUG), 1)
+ifeq ($(DEBUG), 1)
 	CXXFLAGS += -DDEBUG -UNDEBUG -UEDEBUG
 	CFLAGS += -DDEBUG -UNDEBUG -UEDEBUG
 else ifeq ($(SGX_PRERELEASE), 1)
