@@ -6,12 +6,12 @@
 # Additionally, Blender scenes could allow for code execution (e.g. via bundled scripts), so
 # running untrusted scenes should not be allowed. This can be achieved for example by adding scenes
 # to trusted files or uploading them to a running and attested enclave via secured connection.
-sgx.allowed_files.blender_dir = "file:$(BLENDER_DIR)/$(BLENDER_VER)/"
-sgx.allowed_files.blender_input = "file:$(DATA_DIR)/scenes/"
-sgx.allowed_files.blender_output = "file:$(DATA_DIR)/images/"
+sgx.allowed_files.mariadb_dir = "file:$(MARIADB_DIR)/"
+sgx.allowed_files.mariadb_input = "file:$(DATA_DIR)/data/db/"
+sgx.allowed_files.mariadb_output = "file:$(DATA_DIR)/data/"
 
 
-libos.entrypoint = "file:$(BLENDER_DIR)/blender"
+libos.entrypoint = "file:$(MARIADB_DIR)/bin/mariadb"
 
 # Read application arguments directly from the command line. Don't use this on production!
 loader.insecure__use_cmdline_argv = 1
@@ -19,7 +19,7 @@ loader.insecure__use_cmdline_argv = 1
 loader.preload = "file:$(GRAPHENE_DIR)/Runtime/libsysdb.so"
 loader.log_level = "$(GRAPHENE_LOG_LEVEL)"
 
-loader.env.LD_LIBRARY_PATH = "/graphene_lib:/blender_lib:/usr/$(ARCH_LIBDIR):$(ARCH_LIBDIR)"
+loader.env.LD_LIBRARY_PATH = "/graphene_lib:/mariadb_lib:/usr/$(ARCH_LIBDIR):$(ARCH_LIBDIR)"
 loader.env.HOME = "/home/user"
 # Graphene implicitly copies host environment variables - overwriting troublesome one
 loader.env.PWD = ""
@@ -28,9 +28,9 @@ fs.mount.graphene_lib.type = "chroot"
 fs.mount.graphene_lib.path = "/graphene_lib"
 fs.mount.graphene_lib.uri = "file:$(GRAPHENE_DIR)/Runtime"
 
-fs.mount.blender_lib.type = "chroot"
-fs.mount.blender_lib.path = "/blender_lib"
-fs.mount.blender_lib.uri = "file:$(BLENDER_DIR)/lib"
+fs.mount.mariadb_lib.type = "chroot"
+fs.mount.mariadb_lib.path = "/mariadb_lib"
+fs.mount.mariadb_lib.uri = "file:$(MARIADB_DIR)/lib"
 
 fs.mount.usr_lib.type = "chroot"
 fs.mount.usr_lib.path = "/usr/$(ARCH_LIBDIR)"
@@ -44,9 +44,9 @@ fs.mount.scenes.type = "chroot"
 fs.mount.scenes.path = "/data"
 fs.mount.scenes.uri = "file:$(DATA_DIR)"
 
-fs.mount.blender.type = "chroot"
-fs.mount.blender.path = "/blender"
-fs.mount.blender.uri = "file:$(BLENDER_DIR)"
+fs.mount.mariadb.type = "chroot"
+fs.mount.mariadb.path = "/mariadb"
+fs.mount.mariadb.uri = "file:$(MARIADB_DIR)"
 
 
 sys.stack.size = "8M"
@@ -55,7 +55,7 @@ sgx.enclave_size = "2048M"
 sgx.thread_num = 64
 sgx.nonpie_binary = 1
 
-sgx.trusted_files.blender = "file:$(BLENDER_DIR)/blender"
+sgx.trusted_files.mariadb = "file:$(MARIADB_DIR)/bin/mariadb"
 sgx.trusted_files.ld = "file:$(GRAPHENE_DIR)/Runtime/ld-linux-x86-64.so.2"
 sgx.trusted_files.libc = "file:$(GRAPHENE_DIR)/Runtime/libc.so.6"
 sgx.trusted_files.libdl = "file:$(GRAPHENE_DIR)/Runtime/libdl.so.2"
@@ -66,7 +66,15 @@ sgx.trusted_files.librt = "file:$(GRAPHENE_DIR)/Runtime/librt.so.1"
 
 # Loaded in runtime, ldd doesn't list them.
 sgx.trusted_files.libnuma = "file:/usr/$(ARCH_LIBDIR)/libnuma.so.1"
-sgx.trusted_files.libGL = "file:$(BLENDER_DIR)/lib/libGL.so.1"
-sgx.trusted_files.libglapi = "file:$(BLENDER_DIR)/lib/libglapi.so.0"
 sgx.trusted_files.libz = "file:$(ARCH_LIBDIR)/libz.so.1"
 sgx.trusted_files.libstdcpp = "file:/usr/$(ARCH_LIBDIR)/libstdc++.so.6"
+
+sgx.trusted_files.libgalera = "file:$(MARIADB_DIR)/lib/libgalera_smm.so"
+sgx.trusted_files.libmariadb = "file:$(MARIADB_DIR)/lib/libmariadb.so"
+sgx.trusted_files.libmariadb3 = "file:$(MARIADB_DIR)/lib/libmariadb.so.3"
+sgx.trusted_files.libmariadbclient = "file:$(MARIADB_DIR)/lib/libmariadbclient.a"
+sgx.trusted_files.libmysqlclient = "file:$(MARIADB_DIR)/lib/libmysqlclient.a"
+sgx.trusted_files.libmysqlclient3 = "file:$(MARIADB_DIR)/lib/libmysqlclient.so"
+sgx.trusted_files.libmysqlclientr = "file:$(MARIADB_DIR)/lib/libmysqlclient_r.a"
+sgx.trusted_files.libmysqlclientr3 = "file:$(MARIADB_DIR)/lib/libmysqlclient_r.so"
+
